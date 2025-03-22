@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# Babel
+babel.config.js.bak
+
+
 # Expo
 .expo/
 dist/
@@ -18,6 +22,8 @@ web-build/
 
 # Metro
 .metro-health-check*
+metro-cache/
+.cache/
 
 # debug
 npm-debug.*
@@ -31,5 +37,31 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Environment
+.env
+.env.*
+
 # typescript
 *.tsbuildinfo
+
+# Xcode
+ios/
+*.xcworkspace
+xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Android Studio
+android/
+*.iml
+
+# Temporary / backup files
+*.tmp
+*.bak
+*.swp
+*.swo

@@ -4,9 +4,10 @@ import { commonStyles } from '../../styles/common.styles';
 
 const screenWidth = Dimensions.get('window').width;
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create({ 
   container: {
-    ...commonStyles.container,
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
   headerGradient: {
     paddingTop: Platform.OS === 'ios' ? 44 : 40,
@@ -55,6 +56,9 @@ export const styles = StyleSheet.create({
     borderRadius: theme.CONSTANTS.BORDER_RADIUS.lg,
     marginBottom: theme.spacing.md,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.neutral[300],
+    margin: theme.spacing.md,
     ...Platform.select({
       ios: {
         shadowColor: theme.colors.black,
@@ -70,26 +74,71 @@ export const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.gray[200],
+    borderBottomColor: theme.colors.gray.medium,
+    backgroundColor: theme.colors.surface,
+    minHeight: 60,
   },
   cardTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
+    flex: 1,
   },
   cardTitle: {
-    fontSize: theme.typography.size.lg,
+    fontSize: theme.typography.h2.fontSize,
     fontWeight: '600',
     color: theme.colors.text.primary,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.sm,
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.sm,
+  },
+  switchLabel: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.xs,
   },
   splitContainer: {
     flexDirection: 'column',
   },
   waypointPanel: {
-    height: 300,
     backgroundColor: theme.colors.surface,
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.lg,
+    marginTop: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.neutral[200],
+    overflow: 'hidden',
+  },
+  waypointHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral[200],
+    backgroundColor: theme.colors.surface,
+  },
+  waypointHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  waypointHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  waypointTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
   },
   mapPanel: {
     height: 300,
@@ -97,6 +146,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.neutral[200],
+    padding: theme.spacing.md,
     ...theme.shadows.sm,
   },
   routeInfoCard: {
@@ -273,5 +323,181 @@ export const styles = StyleSheet.create({
   modalButtonTextSecondary: {
     ...commonStyles.buttonLabel,
     color: theme.colors.text.primary,
+  },
+  styleButton: {
+    ...commonStyles.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+  },
+  styleButtonText: {
+    ...theme.typography.button,
+    color: theme.colors.primary[500],
+    marginLeft: theme.spacing.sm,
+  },
+  iconButton: {
+    ...commonStyles.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+  },
+  iconButtonText: {
+    ...theme.typography.button,
+    color: theme.colors.primary[500],
+    marginLeft: theme.spacing.sm,
+  },
+  exportButton: {
+    ...commonStyles.button,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+  },
+  exportButtonText: {
+    ...theme.typography.button,
+    color: theme.colors.primary[500],
+    marginLeft: theme.spacing.sm,
+  },
+  colorPicker: {
+    marginBottom: theme.spacing.xl,
+  },
+  colorPickerLabel: {
+    ...theme.typography.caption,
+    marginBottom: theme.spacing.sm,
+  },
+  colorOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.sm,
+  },
+  colorOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: theme.colors.neutral[200],
+  },
+  colorOptionSelected: {
+    borderColor: theme.colors.primary[500],
+    borderWidth: 3,
+  },
+  strokeWidthSlider: {
+    marginBottom: theme.spacing.xl,
+  },
+  strokeWidthLabel: {
+    ...theme.typography.caption,
+    marginBottom: theme.spacing.sm,
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.md,
+    padding: theme.spacing.md,
+  },
+  iconGridItem: {
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.md,
+    backgroundColor: theme.colors.neutral[100],
+  },
+  iconGridItemSelected: {
+    backgroundColor: theme.colors.primary[100],
+    borderColor: theme.colors.primary[500],
+    borderWidth: 2,
+  },
+  iconGridItemLabel: {
+    ...theme.typography.caption,
+    marginTop: theme.spacing.xs,
+    textAlign: 'center',
+  },
+  mapContainer: {
+    height: 300,
+    width: '100%',
+  },
+  routeDetailsContainer: {
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: theme.CONSTANTS.BORDER_RADIUS.lg,
+    borderTopRightRadius: theme.CONSTANTS.BORDER_RADIUS.lg,
+    marginTop: -20,
+    paddingTop: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
+    minHeight: 200,
+  },
+  routeDetailsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+  },
+  routeDetailsTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  routeDetailsTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    marginLeft: theme.spacing.sm,
+  },
+  routeStyleSection: {
+    marginBottom: theme.spacing.lg,
+    backgroundColor: theme.colors.neutral[50],
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.md,
+    padding: theme.spacing.md,
+  },
+  routeStyleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  routeStyleTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+  },
+  routeStyleControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  waypointItem: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: theme.colors.neutral[200],
+  },
+  waypointLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    width: 80,
+  },
+  coordinatesText: {
+    flex: 1,
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    marginHorizontal: theme.spacing.md,
+  },
+  waypointActions: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  waypointActionButton: {
+    padding: theme.spacing.xs,
+    borderRadius: theme.CONSTANTS.BORDER_RADIUS.sm,
+    backgroundColor: theme.colors.neutral[100],
   },
 }); 

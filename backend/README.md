@@ -49,7 +49,7 @@ cp .env.example .env
 
 The application uses environment variables for configuration. Key settings include:
 
-- `DATABASE_URL`: SQLite database URL (default: sqlite:///./routes.db)
+- `DATABASE_URL`: SQLite database URL (default: sqlite:///./app/routes.db)
 - `ALLOW_CORS_ALL`: Enable all origins for CORS (development only)
 - `CORS_ORIGINS`: List of allowed origins for CORS
 - `API_V1_STR`: API version prefix

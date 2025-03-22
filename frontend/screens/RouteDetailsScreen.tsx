@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView } fr
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { getApiUrl } from '../config';
+import { getApiUrl } from '../utils/api';
 import MapComponent from '../components/MapView';
 import { styles } from '../styles/route-details.styles';
-import { colors } from '../styles/theme';
+import { theme } from '../styles/theme';
 import { RootStackParamList } from '../types/navigation';
 
 interface Coordinates {
@@ -105,7 +105,7 @@ const RouteDetailsScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
       </View>
     );
   }
@@ -129,7 +129,7 @@ const RouteDetailsScreen = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>Route Details</Text>
         </View>
@@ -137,9 +137,9 @@ const RouteDetailsScreen = () => {
           style={styles.deleteButton}
           onPress={handleDelete}
         >
-          <Ionicons name="trash-outline" size={24} color={colors.error} />
+          <Ionicons name="trash-outline" size={24} color={theme.colors.primary[500]} />
         </TouchableOpacity>
-      </View>
+      </View> 
 
       <ScrollView style={styles.content}>
         <View style={styles.routeInfoCard}>
@@ -148,12 +148,12 @@ const RouteDetailsScreen = () => {
           
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Ionicons name="speedometer-outline" size={24} color={colors.primary} />
+              <Ionicons name="speedometer-outline" size={24} color={theme.colors.primary[500]} />
               <Text style={styles.statValue}>{formatDistance(routeData.distance)}</Text>
               <Text style={styles.statLabel}>Distance</Text>
             </View>
             <View style={styles.statItem}>
-              <Ionicons name="time-outline" size={24} color={colors.primary} />
+              <Ionicons name="time-outline" size={24} color={theme.colors.primary[500]} />
               <Text style={styles.statValue}>{formatDuration(routeData.duration)}</Text>
               <Text style={styles.statLabel}>Duration</Text>
             </View>
@@ -162,16 +162,13 @@ const RouteDetailsScreen = () => {
 
         <View style={styles.mapContainer}>
           <MapComponent
-            initialRegion={{
+            region={{
               latitude: routeData.origin.latitude,
               longitude: routeData.origin.longitude,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
-            route={{
-              waypoints: [routeData.origin, routeData.destination],
-              coordinates: routeData.route,
-            }}
+            route={routeData.route}
           />
         </View>
 

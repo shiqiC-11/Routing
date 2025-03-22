@@ -34,7 +34,7 @@ const CustomMapView: React.FC<MapViewProps> = ({
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
+        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         region={region}
         onRegionChange={onRegionChange}
         onPress={onMapPress}

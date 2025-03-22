@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
-import { View, Alert, TouchableOpacity, Text, Switch, Platform, ScrollView, Modal, TextInput } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Alert, TouchableOpacity, Text, Switch, Platform, ScrollView, Modal, TextInput, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import { getApiUrl } from '../config';
+import { getApiUrl } from '../utils/api';
 import MapComponent from '../components/MapView';
 import WaypointList from '../components/WaypointList';
+import { HandDrawnRoute } from '../components/HandDrawnRoute';
+import { MapIcons } from '../components/MapIcons';
 import { theme } from '../styles/theme';
 import { styles } from './styles/CreateRouteScreen.styles';
 import type { RootStackParamList } from '../types/navigation';
 import type { Region } from 'react-native-maps';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
+import { StylePanel } from '../components/StylePanel';
+import { IconPanel } from '../components/IconPanel';
+import { RouteStyle, MapIcon } from '../types/map';
+
+const screenWidth = Dimensions.get('window').width;
 
 interface Coordinates {
   latitude: number;
@@ -70,6 +80,16 @@ const CreateRouteScreen = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [titleError, setTitleError] = useState('');
+  const [isHandDrawnMode, setIsHandDrawnMode] = useState(false);
+  const [mapIcons, setMapIcons] = useState<MapIcon[]>([]);
+  const [selectedIconType, setSelectedIconType] = useState<string>('landmark');
+  const [routeStyle, setRouteStyle] = useState<RouteStyle>({
+    color: theme.colors.primary[500],
+    strokeWidth: 3,
+    handDrawnEffect: true
+  });
+  const [isIconPanelVisible, setIsIconPanelVisible] = useState(false);
+  const [isStylePanelVisible, setIsStylePanelVisible] = useState(false);
 
   const handleMapPress = async (event: { nativeEvent: { coordinate: Coordinates } }) => {
     const coordinate = event.nativeEvent.coordinate;
@@ -355,6 +375,61 @@ const CreateRouteScreen = () => {
     }
   };
 
+  const handleIconAdd = (coordinate: Coordinates) => {
+    const newIcon: MapIcon = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: selectedIconType,
+      position: coordinate,
+      color: routeStyle.color,
+      scale: 1
+    };
+    setMapIcons([...mapIcons, newIcon]);
+  };
+
+  const handleIconMove = (id: string, position: Coordinates) => {
+    setMapIcons(prev => prev.map(icon => 
+      icon.id === id ? { ...icon, position } : icon
+    ));
+  };
+
+  const handleStyleChange = (updates: Partial<RouteStyle>) => {
+    setRouteStyle(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleExportMap = async () => {
+    try {
+      // Request permissions
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please grant permission to save images');
+        return;
+      }
+
+      // Generate map image (this is a placeholder - you'll need to implement actual map capture)
+      const mapImage = await captureMap();
+      
+      // Save to media library
+      const asset = await MediaLibrary.createAssetAsync(mapImage);
+      
+      // Share options
+      const shareOptions = {
+        mimeType: 'image/png',
+        dialogTitle: 'Share your travel map',
+      };
+      
+      await Sharing.shareAsync(asset.uri, shareOptions);
+    } catch (error) {
+      console.error('Error exporting map:', error);
+      Alert.alert('Error', 'Failed to export map. Please try again.');
+    }
+  };
+
+  const captureMap = async () => {
+    // This is a placeholder - you'll need to implement actual map capture
+    // You might use react-native-view-shot or a similar library
+    return 'path/to/captured/image.png';
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerGradient}>
@@ -380,101 +455,96 @@ const CreateRouteScreen = () => {
               styles.saveButtonText,
               (!route.coordinates || isSaving) && styles.saveButtonTextDisabled
             ]}>
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? 'Saving...' : 'SAVE'}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardTitleContainer}>
-              <Ionicons name="map-outline" size={24} color={theme.colors.primary[500]} />
-              <Text style={styles.cardTitle}>Route Details</Text>
-            </View>
-          </View>
-          <View style={styles.splitContainer}>
-            <View style={styles.mapPanel}>
-              <MapComponent
-                region={{
-                  latitude: 37.78825,
-                  longitude: -122.4324,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                }}
-                route={route.coordinates}
-                markers={waypoints.map(wp => ({
-                  id: wp.id,
-                  coordinate: wp.coordinates
-                }))}
-                onMapPress={handleMapPress}
-                onMarkerDragEnd={(id, coordinate) => {
-                  const index = waypoints.findIndex(wp => wp.id === id);
-                  if (index !== -1) {
-                    setWaypoints(prev => {
-                      const updated = [...prev];
-                      updated[index] = {
-                        ...updated[index],
-                        coordinates: coordinate
-                      };
-                      return updated;
-                    });
-                    setDebugInfo(`Updated waypoint ${index + 1} position`);
-                  }
-                }}
-              />
-            </View>
-            {waypoints.length > 0 && (
-              <View style={styles.waypointPanel}>
-                <WaypointList
-                  waypoints={waypoints}
-                  onMoveUp={(index) => handleWaypointReorder(index, index - 1)}
-                  onMoveDown={(index) => handleWaypointReorder(index, index + 1)}
-                  onDelete={handleWaypointDelete}
-                  onEdit={handleWaypointPress}
-                />
-              </View>
-            )}
-          </View>
+      <ScrollView style={styles.content}>
+        <View style={styles.mapContainer}>
+          {!isHandDrawnMode && <MapComponent
+            region={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+            route={route.coordinates}
+            markers={waypoints.map(wp => ({
+              id: wp.id,
+              coordinate: wp.coordinates
+            }))}
+            onMapPress={handleMapPress}
+            onMarkerDragEnd={handleMarkerDragEnd}
+          />}
+          
+          {isHandDrawnMode && route.coordinates && (
+            <HandDrawnRoute
+              points={route.coordinates}
+              style={routeStyle}
+              width={screenWidth}
+              height={300}
+            />
+          )}
+
+          <MapIcons
+            icons={mapIcons}
+            onIconMove={handleIconMove}
+          />
         </View>
 
-        {route.coordinates && (
-          <View style={styles.routeInfoCard}>
-            <View style={styles.routeInfoHeader}>
-              <Text style={styles.routeInfoTitle}>Route Summary</Text>
+        <View style={styles.routeDetailsContainer}>
+          <View style={styles.routeDetailsHeader}>
+            <View style={styles.routeDetailsTitleContainer}>
+              <Ionicons name="map-outline" size={24} color={theme.colors.primary[500]} />
+              <Text style={styles.routeDetailsTitle}>Route Details</Text>
             </View>
-            <View style={styles.routeInfoContent}>
-              <View style={styles.routeInfoRow}>
-                <View style={styles.routeInfoItem}>
-                  <View style={styles.routeInfoIcon}>
-                    <Ionicons name="speedometer-outline" size={24} color={theme.colors.primary[500]} />
-                  </View>
-                  <View style={styles.routeInfoDetails}>
-                    <Text style={styles.routeInfoLabel}>Total Distance</Text>
-                    <Text style={styles.routeInfoValue}>{formatDistance(route.distance || 0)}</Text>
-                  </View>
-                </View>
-                <View style={styles.routeInfoDivider} />
-                <View style={styles.routeInfoItem}>
-                  <View style={styles.routeInfoIcon}>
-                    <Ionicons name="time-outline" size={24} color={theme.colors.primary[500]} />
-                  </View>
-                  <View style={styles.routeInfoDetails}>
-                    <Text style={styles.routeInfoLabel}>Estimated Time</Text>
-                    <Text style={styles.routeInfoValue}>{formatDuration(route.duration || 0)}</Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.routeInfoStats}>
-                <View style={styles.routeInfoStat}>
-                  <Text style={styles.routeInfoStatLabel}>Waypoints</Text>
-                  <Text style={styles.routeInfoStatValue}>{waypoints.length}</Text>
-                </View>
-              </View>
+            <View style={styles.routeStyleControls}>
+              <Text>Hand-drawn</Text>
+              <Switch
+                value={isHandDrawnMode}
+                onValueChange={setIsHandDrawnMode}
+                trackColor={{
+                  false: theme.colors.neutral[300],
+                  true: theme.colors.primary[500],
+                }}
+                thumbColor={isHandDrawnMode ? theme.colors.primary[700] : theme.colors.neutral[100]}
+              />
             </View>
           </View>
-        )}
+
+          <View style={styles.routeStyleSection}>
+            <View style={styles.routeStyleHeader}>
+              <Text style={styles.routeStyleTitle}>Route Style</Text>
+            </View>
+          </View>
+
+          {waypoints.map((waypoint, index) => (
+            <View key={waypoint.id} style={styles.waypointItem}>
+              <Text style={styles.waypointLabel}>
+                {index === 0 ? 'Start' : index === waypoints.length - 1 ? 'End' : `Waypoint ${index}`}
+              </Text>
+              <Text style={styles.coordinatesText}>
+                {formatCoordinates(waypoint.coordinates)}
+              </Text>
+              <View style={styles.waypointActions}>
+                <TouchableOpacity
+                  onPress={() => handleWaypointPress(index)}
+                  style={styles.waypointActionButton}
+                >
+                  <Ionicons name="create-outline" size={20} color={theme.colors.primary[500]} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleWaypointDelete(index)}
+                  style={styles.waypointActionButton}
+                >
+                  <Ionicons name="trash-outline" size={20} color={theme.colors.error[500]} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
       </ScrollView>
 
       {waypoints.length > 0 && (
@@ -562,6 +632,62 @@ const CreateRouteScreen = () => {
                   <Text style={styles.modalButtonTextPrimary}>Save</Text>
                 </TouchableOpacity>
               </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isStylePanelVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsStylePanelVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Customize Style</Text>
+              <TouchableOpacity
+                onPress={() => setIsStylePanelVisible(false)}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text.primary} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalContent}>
+              <StylePanel
+                style={routeStyle}
+                onStyleChange={handleStyleChange}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isIconPanelVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsIconPanelVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Icons</Text>
+              <TouchableOpacity
+                onPress={() => setIsIconPanelVisible(false)}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text.primary} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalContent}>
+              <IconPanel
+                selectedType={selectedIconType}
+                onSelectType={(type) => {
+                  setSelectedIconType(type);
+                  setIsIconPanelVisible(false);
+                  setDebugInfo('Tap on the map to add an icon');
+                }}
+              />
             </View>
           </View>
         </View>

@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@babel/core": "^7.26.10",
+    "@react-navigation/bottom-tabs": "^7.3.1",
+    "@react-navigation/native": "^7.0.17",
+    "babel-preset-expo": "^12.0.9",
+    "expo": "^52.0.41",
+    "metro-react-native-babel-transformer": "^0.77.0",
+    "react-native-reanimated": "^3.3.0"
+  }
+}

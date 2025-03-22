@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -57,7 +57,7 @@ const HomeScreen = () => {
       setLoading(true);
       setError(null);
       const apiUrl = getApiUrl();
-      const response = await axios.get<SavedRoute[]>(`${apiUrl}/api/v1/routes/`);
+      const response = await axios.get<SavedRoute[]>(`${apiUrl}/routes/`);
       setRoutes(response.data);
     } catch (error: any) {
       console.error('Error fetching routes:', error);

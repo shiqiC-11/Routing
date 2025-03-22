@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Google Maps Configuration
-    GOOGLE_MAPS_API_KEY: str
+    GOOGLE_MAPS_API_KEY: str | None = None
 
     # Server Configuration
     HOST: str = "0.0.0.0"
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     ALLOW_CORS_ALL: bool = True  # Set to True during development
 
     # Database settings
-    DATABASE_URL: str = "sqlite:///./routes.db"
+    DATABASE_URL: str = "sqlite:///./app/routes.db"
     
     # OSRM settings
     OSRM_SERVER_URL: str = "http://router.project-osrm.org"
@@ -34,12 +34,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
-
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str) -> any:
-            if field_name == "CORS_ORIGINS" and raw_val:
-                return [origin.strip() for origin in raw_val.split(",")]
-            return raw_val
 
     @property
     def is_development(self) -> bool:
