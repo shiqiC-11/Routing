@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Switch, Dimensions } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { getApiUrl } from '../utils/api';
 import MapComponent from '../components/MapView';
+import { HandDrawnRoute } from '../components/HandDrawnRoute';
 import { styles } from '../styles/route-details.styles';
 import { theme } from '../styles/theme';
 import { RootStackParamList } from '../types/navigation';
+import { RouteStyle } from '../types/map';
+
+const screenWidth = Dimensions.get('window').width;
 
 interface Coordinates {
   latitude: number;
@@ -53,9 +57,14 @@ const formatDuration = (seconds: number) => {
 const RouteDetailsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<RouteDetailsScreenRouteProp>();
-  const [routeData, setRouteData] = useState<SavedRoute | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [routeDetails, setRouteDetails] = useState<SavedRoute | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isHandDrawnMode, setIsHandDrawnMode] = useState(false);
+  const [routeStyle, setRouteStyle] = useState<RouteStyle>({
+    color: theme.colors.primary[500],
+    strokeWidth: 3,
+    handDrawnEffect: true
+  });
 
   useEffect(() => {
     fetchRouteDetails();
@@ -63,17 +72,15 @@ const RouteDetailsScreen = () => {
 
   const fetchRouteDetails = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
+      setLoading(true);
       const apiUrl = getApiUrl();
       const response = await axios.get<SavedRoute>(`${apiUrl}/routes/${route.params.routeId}`);
-      setRouteData(response.data);
+      setRouteDetails(response.data);
     } catch (error: any) {
       console.error('Error fetching route details:', error);
-      setError('Failed to load route details. Please try again.');
       Alert.alert('Error', 'Failed to load route details. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -102,25 +109,6 @@ const RouteDetailsScreen = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
-      </View>
-    );
-  }
-
-  if (error || !routeData) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error || 'Route not found'}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={fetchRouteDetails}>
-          <Text style={styles.retryButtonText}>Retry</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -137,55 +125,95 @@ const RouteDetailsScreen = () => {
           style={styles.deleteButton}
           onPress={handleDelete}
         >
-          <Ionicons name="trash-outline" size={24} color={theme.colors.primary[500]} />
+          <Ionicons name="trash-outline" size={24} color={theme.colors.error[500]} />
         </TouchableOpacity>
-      </View> 
+      </View>
 
       <ScrollView style={styles.content}>
-        <View style={styles.routeInfoCard}>
-          <Text style={styles.routeTitle}>{routeData.title}</Text>
-          <Text style={styles.routeDescription}>{routeData.description}</Text>
-          
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Ionicons name="speedometer-outline" size={24} color={theme.colors.primary[500]} />
-              <Text style={styles.statValue}>{formatDistance(routeData.distance)}</Text>
-              <Text style={styles.statLabel}>Distance</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        ) : routeDetails ? (
+          <>
+            <View style={styles.mapContainer}>
+              {!isHandDrawnMode && <MapComponent
+                region={{
+                  latitude: routeDetails.origin.latitude,
+                  longitude: routeDetails.origin.longitude,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                }}
+                route={routeDetails.route}
+                markers={[
+                  { id: 'origin', coordinate: routeDetails.origin },
+                  { id: 'destination', coordinate: routeDetails.destination },
+                  ...routeDetails.waypoints.map((wp, index) => ({
+                    id: `waypoint-${index}`,
+                    coordinate: wp.coordinates
+                  }))
+                ]}
+              />}
+              
+              {isHandDrawnMode && routeDetails.route && (
+                <HandDrawnRoute
+                  points={routeDetails.route}
+                  style={routeStyle}
+                  width={screenWidth}
+                  height={300}
+                />
+              )}
             </View>
-            <View style={styles.statItem}>
-              <Ionicons name="time-outline" size={24} color={theme.colors.primary[500]} />
-              <Text style={styles.statValue}>{formatDuration(routeData.duration)}</Text>
-              <Text style={styles.statLabel}>Duration</Text>
+
+            <View style={styles.routeStyleControls}>
+              <Text style={styles.routeStyleLabel}>Hand-drawn</Text>
+              <Switch
+                value={isHandDrawnMode}
+                onValueChange={setIsHandDrawnMode}
+                trackColor={{
+                  false: theme.colors.neutral[300],
+                  true: theme.colors.primary[500],
+                }}
+                thumbColor={isHandDrawnMode ? theme.colors.primary[700] : theme.colors.neutral[100]}
+              />
             </View>
-          </View>
-        </View>
 
-        <View style={styles.mapContainer}>
-          <MapComponent
-            region={{
-              latitude: routeData.origin.latitude,
-              longitude: routeData.origin.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            route={routeData.route}
-          />
-        </View>
+            <View style={styles.detailsContainer}>
+              <View style={styles.routeInfoCard}>
+                <Text style={styles.routeTitle}>{routeDetails.title}</Text>
+                <Text style={styles.routeDescription}>{routeDetails.description}</Text>
+                
+                <View style={styles.statsContainer}>
+                  <View style={styles.statItem}>
+                    <Ionicons name="speedometer-outline" size={24} color={theme.colors.primary[500]} />
+                    <Text style={styles.statValue}>{formatDistance(routeDetails.distance)}</Text>
+                    <Text style={styles.statLabel}>Distance</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Ionicons name="time-outline" size={24} color={theme.colors.primary[500]} />
+                    <Text style={styles.statValue}>{formatDuration(routeDetails.duration)}</Text>
+                    <Text style={styles.statLabel}>Duration</Text>
+                  </View>
+                </View>
+              </View>
 
-        <View style={styles.coordinatesCard}>
-          <View style={styles.coordinateItem}>
-            <Text style={styles.coordinateLabel}>Origin</Text>
-            <Text style={styles.coordinateValue}>
-              {routeData.origin.latitude.toFixed(6)}, {routeData.origin.longitude.toFixed(6)}
-            </Text>
-          </View>
-          <View style={styles.coordinateItem}>
-            <Text style={styles.coordinateLabel}>Destination</Text>
-            <Text style={styles.coordinateValue}>
-              {routeData.destination.latitude.toFixed(6)}, {routeData.destination.longitude.toFixed(6)}
-            </Text>
-          </View>
-        </View>
+              <View style={styles.coordinatesCard}>
+                <View style={styles.coordinateItem}>
+                  <Text style={styles.coordinateLabel}>Origin</Text>
+                  <Text style={styles.coordinateValue}>
+                    {routeDetails.origin.latitude.toFixed(6)}, {routeDetails.origin.longitude.toFixed(6)}
+                  </Text>
+                </View>
+                <View style={styles.coordinateItem}>
+                  <Text style={styles.coordinateLabel}>Destination</Text>
+                  <Text style={styles.coordinateValue}>
+                    {routeDetails.destination.latitude.toFixed(6)}, {routeDetails.destination.longitude.toFixed(6)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </>
+        ) : (
+          <Text style={styles.errorText}>Failed to load route details</Text>
+        )}
       </ScrollView>
     </View>
   );
