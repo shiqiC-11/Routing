@@ -16,13 +16,23 @@ A full-stack route planning application built with React Native and FastAPI. The
 ## Tech Stack
 
 ### Frontend
-- React Native with Expo
-- TypeScript
-- React Navigation
-- React Native Maps
-- Axios for API communication
+- React Native (0.73.6) with Expo (50.0.0)
+- TypeScript (5.3.0)
+- React Navigation (6.1.12)
+- React Native Maps (1.10.0)
+- Axios (1.6.2) for API communication
 - Expo Vector Icons
-- Styled Components for styling
+- React Native Reanimated (3.6.2) for animations
+- React Native Gesture Handler (2.14.0)
+- React Native SVG (14.1.0)
+- React Native Skia (0.1.221) for graphics
+- React Native Safe Area Context (4.8.2)
+- React Native Screens (3.29.0)
+- Expo File System (16.0.9)
+- Expo Media Library (15.9.2)
+- Expo Sharing (11.10.0)
+- Expo Splash Screen (0.26.5)
+- Expo Status Bar (1.11.1)
 
 ### Backend
 - FastAPI
@@ -401,11 +411,13 @@ After installing new dependencies:
    ```
 
 ### Package Versions
-- react-native-maps: ^1.7.1
-- @shopify/react-native-skia: ^0.1.221
-- react-native-reanimated: ^3.17.1
-- react-native-svg: ^14.1.0
-- @react-native-community/slider: ^4.4.3
-- expo-media-library: ^15.9.1
-- expo-sharing: ^11.10.0
-- expo-file-system: ^15.9.0 
+- react-native-maps: 1.10.0
+- @shopify/react-native-skia: 0.1.221
+- react-native-reanimated: 3.6.2
+- react-native-svg: 14.1.0
+- @react-native-community/slider: 4.4.2
+- expo-media-library: 15.9.2
+- expo-sharing: 11.10.0
+- expo-file-system: 16.0.9
+- expo-splash-screen: 0.26.5
+- expo-status-bar: 1.11.1 
