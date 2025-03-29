@@ -500,4 +500,28 @@ export const styles = StyleSheet.create({
     borderRadius: theme.CONSTANTS.BORDER_RADIUS.sm,
     backgroundColor: theme.colors.neutral[100],
   },
+  waypointNameEdit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
+  waypointNameInput: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.colors.text.primary,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: theme.colors.neutral[100],
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  waypointNameSaveButton: {
+    padding: 4,
+    marginLeft: 4,
+  },
+  waypointLabelContainer: {
+    flex: 1,
+    marginRight: 8,
+  },
 }); 
