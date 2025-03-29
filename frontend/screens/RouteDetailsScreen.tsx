@@ -196,17 +196,50 @@ const RouteDetailsScreen = () => {
               </View>
 
               <View style={styles.coordinatesCard}>
-                <View style={styles.coordinateItem}>
-                  <Text style={styles.coordinateLabel}>Origin</Text>
-                  <Text style={styles.coordinateValue}>
-                    {routeDetails.origin.latitude.toFixed(6)}, {routeDetails.origin.longitude.toFixed(6)}
-                  </Text>
-                </View>
-                <View style={styles.coordinateItem}>
-                  <Text style={styles.coordinateLabel}>Destination</Text>
-                  <Text style={styles.coordinateValue}>
-                    {routeDetails.destination.latitude.toFixed(6)}, {routeDetails.destination.longitude.toFixed(6)}
-                  </Text>
+                <View style={styles.routePath}>
+                  {/* Origin Point */}
+                  <View style={styles.waypointRow}>
+                    <View style={styles.waypointVisual}>
+                      <View style={[styles.waypointDot, styles.originDot]}>
+                        <Ionicons name="location" size={13} color={theme.colors.white} />
+                      </View>
+                      <View style={styles.connectingLine} />
+                    </View>
+                    <View style={styles.waypointInfo}>
+                      <Text style={styles.coordinateName}>
+                        {routeDetails.waypoints[0]?.name || 'Origin'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Intermediate Waypoints */}
+                  {routeDetails.waypoints.slice(1, -1).map((waypoint, index) => (
+                    <View key={`waypoint-${index}`} style={styles.waypointRow}>
+                      <View style={styles.waypointVisual}>
+                        <View style={[styles.waypointDot, styles.intermediateDot]} />
+                        <View style={styles.connectingLine} />
+                      </View>
+                      <View style={styles.waypointInfo}>
+                        <Text style={styles.coordinateName}>
+                          {waypoint.name || `Waypoint ${index + 1}`}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+
+                  {/* Destination Point */}
+                  <View style={styles.waypointRow}>
+                    <View style={styles.waypointVisual}>
+                      <View style={[styles.waypointDot, styles.destinationDot]}>
+                        <Ionicons name="location" size={13} color={theme.colors.white} />
+                      </View>
+                    </View>
+                    <View style={styles.waypointInfo}>
+                      <Text style={styles.coordinateName}>
+                        {routeDetails.waypoints[routeDetails.waypoints.length - 1]?.name || 'Home'}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>

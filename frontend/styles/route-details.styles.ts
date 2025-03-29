@@ -122,8 +122,57 @@ export const styles = StyleSheet.create({
     borderRadius: theme.CONSTANTS.BORDER_RADIUS.large,
     ...(Platform.OS === 'ios' ? theme.shadows.medium.ios : theme.shadows.medium.android),
   },
-  coordinateItem: {
+  routePath: {
+    paddingLeft: theme.spacing.small,
+  },
+  waypointRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: theme.spacing.medium,
+    position: 'relative',
+  },
+  waypointVisual: {
+    width: 24,
+    alignItems: 'center',
+    marginRight: theme.spacing.medium,
+    position: 'relative',
+  },
+  waypointDot: {
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary[500],
+    zIndex: 1,
+  },
+  originDot: {
+    width: 18,
+    height: 18,
+    backgroundColor: theme.colors.success[500],
+  },
+  intermediateDot: {
+    width: 15,
+    height: 15,
+    backgroundColor: theme.colors.primary[500],
+  },
+  destinationDot: {
+    width: 18,
+    height: 18,
+    backgroundColor: theme.colors.error[500],
+  },
+  connectingLine: {
+    position: 'absolute',
+    width: 2,
+    backgroundColor: theme.colors.neutral[300],
+    left: 11,
+    top: 20,
+    bottom: -20,
+  },
+  lastConnectingLine: {
+    display: 'none',
+  },
+  waypointInfo: {
+    flex: 1,
+    paddingTop: 2,
   },
   coordinateLabel: {
     fontSize: 14,
@@ -131,6 +180,12 @@ export const styles = StyleSheet.create({
     marginBottom: theme.spacing.small,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  coordinateName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.small,
   },
   coordinateValue: {
     fontSize: 16,
