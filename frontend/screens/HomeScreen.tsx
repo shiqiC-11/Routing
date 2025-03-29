@@ -117,12 +117,12 @@ const HomeScreen = () => {
       ) : null}
       <View style={styles.routeInfo}>
         <View style={styles.routePoints}>
-          <Text style={styles.routePointText}>
-            From: {formatCoordinates(item.origin)}
-          </Text>
-          <Text style={styles.routePointText}>
-            To: {formatCoordinates(item.destination)}
-          </Text>
+          {item.waypoints[0].name? <Text style={styles.routePointText}>
+            From: {item.waypoints[0].name}
+          </Text> : null}
+          {item.waypoints[item.waypoints.length - 1].name? <Text style={styles.routePointText}>
+            To: {item.waypoints[item.waypoints.length - 1].name}
+          </Text> : null}
         </View>
       </View>
     </TouchableOpacity>
