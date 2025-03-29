@@ -90,6 +90,13 @@ const CreateRouteScreen = () => {
   });
   const [isIconPanelVisible, setIsIconPanelVisible] = useState(false);
   const [isStylePanelVisible, setIsStylePanelVisible] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState<number | null>(null);
+  const [currentMapPosition, setCurrentMapPosition] = useState<Region>({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
 
   const handleMapPress = async (event: { nativeEvent: { coordinate: Coordinates } }) => {
     const coordinate = event.nativeEvent.coordinate;
@@ -315,7 +322,7 @@ const CreateRouteScreen = () => {
         duration: parseFloat((route.duration || 0).toString())
       };
 
-      console.log('Saving route data:', JSON.stringify(routeData, null, 2));
+      // console.log('Saving route data:', JSON.stringify(routeData, null, 2));
       console.log('Data types:', {
         originLat: typeof routeData.origin.latitude,
         originLng: typeof routeData.origin.longitude,
@@ -358,7 +365,9 @@ const CreateRouteScreen = () => {
   };
 
   const handleRegionChange = (region: Region) => {
-    // Handle region change if needed
+    const zoomLevel = (region.latitudeDelta + region.longitudeDelta) / 2;
+    setCurrentZoom(zoomLevel);
+    setCurrentMapPosition(region);
   };
 
   const handleMarkerDragEnd = (id: string, coordinate: Coordinates) => {
@@ -464,12 +473,7 @@ const CreateRouteScreen = () => {
       <ScrollView style={styles.content}>
         <View style={styles.mapContainer}>
           {!isHandDrawnMode && <MapComponent
-            region={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            region={currentMapPosition}
             route={route.coordinates}
             markers={waypoints.map(wp => ({
               id: wp.id,
@@ -477,6 +481,7 @@ const CreateRouteScreen = () => {
             }))}
             onMapPress={handleMapPress}
             onMarkerDragEnd={handleMarkerDragEnd}
+            onRegionChange={handleRegionChange}
           />}
           
           {isHandDrawnMode && route.coordinates && (

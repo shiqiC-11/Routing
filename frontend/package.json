@@ -33,7 +33,8 @@
     "react-native-screens": "~3.29.0",
     "react-native-svg": "14.1.0",
     "typescript": "^5.3.0",
-    "@types/react": "~18.2.45"
+    "@types/react": "~18.2.45",
+    "expo-location": "~16.5.5"
   },
   "devDependencies": {
     "babel-preset-expo": "^10.0.0",
