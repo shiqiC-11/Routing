@@ -38,6 +38,16 @@ export const useMapAnchor = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isInitialMount = useRef(true);
+  const userZoomRef = useRef<number | null>(null);
+
+  // Handle user zoom changes
+  const handleRegionChange = (newRegion: Region) => {
+    // Only update zoom if it's a user action (not our initialization)
+    if (!isInitialMount.current) {
+      userZoomRef.current = (newRegion.latitudeDelta + newRegion.longitudeDelta) / 2;
+    }
+    setRegion(newRegion);
+  };
 
   // Initialize map region
   useEffect(() => {
@@ -57,8 +67,8 @@ export const useMapAnchor = ({
           newRegion = {
             latitude: firstPoint.latitude,
             longitude: firstPoint.longitude,
-            latitudeDelta: defaultRegion.latitudeDelta,
-            longitudeDelta: defaultRegion.longitudeDelta,
+            latitudeDelta: ZOOM_LEVELS.DEFAULT,
+            longitudeDelta: ZOOM_LEVELS.DEFAULT,
           };
         } else {
           // 2. Second priority: Try to get user's location
@@ -73,14 +83,20 @@ export const useMapAnchor = ({
             newRegion = {
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
-              latitudeDelta: defaultRegion.latitudeDelta,
-              longitudeDelta: defaultRegion.longitudeDelta,
+              latitudeDelta: ZOOM_LEVELS.DEFAULT,
+              longitudeDelta: ZOOM_LEVELS.DEFAULT,
             };
           } else {
             console.log('Location permission denied, using default region');
             // 3. Third priority: Fallback to default region
             newRegion = defaultRegion;
           }
+        }
+
+        // If we have a user's zoom level and preserveZoom is true, use it
+        if (preserveZoom && userZoomRef.current !== null) {
+          newRegion.latitudeDelta = userZoomRef.current;
+          newRegion.longitudeDelta = userZoomRef.current;
         }
 
         setRegion(newRegion);
@@ -95,7 +111,7 @@ export const useMapAnchor = ({
     };
 
     initializeMap();
-  }, [routePoints, autoAnchor, defaultRegion]);
+  }, [routePoints, autoAnchor, defaultRegion, preserveZoom]);
 
-  return { region, setRegion, loading, error };
+  return { region, setRegion: handleRegionChange, loading, error };
 };

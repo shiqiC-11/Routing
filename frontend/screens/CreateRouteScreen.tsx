@@ -97,6 +97,9 @@ const CreateRouteScreen = () => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const [editingWaypointName, setEditingWaypointName] = useState<string>('');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingNameIndex, setEditingNameIndex] = useState<number | null>(null);
 
   const handleMapPress = async (event: { nativeEvent: { coordinate: Coordinates } }) => {
     const coordinate = event.nativeEvent.coordinate;
@@ -439,6 +442,29 @@ const CreateRouteScreen = () => {
     return 'path/to/captured/image.png';
   };
 
+  // Update waypoint name handler
+  const handleWaypointNameEdit = (index: number) => {
+    setIsEditingName(true);
+    setEditingNameIndex(index);
+    setEditingWaypointName(waypoints[index].name || '');
+  };
+
+  const handleNameSave = () => {
+    if (editingNameIndex !== null) {
+      setWaypoints(prev => {
+        const updated = [...prev];
+        updated[editingNameIndex] = {
+          ...updated[editingNameIndex],
+          name: editingWaypointName.trim() || undefined
+        };
+        return updated;
+      });
+    }
+    setIsEditingName(false);
+    setEditingNameIndex(null);
+    setEditingWaypointName('');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerGradient}>
@@ -527,9 +553,44 @@ const CreateRouteScreen = () => {
 
           {waypoints.map((waypoint, index) => (
             <View key={waypoint.id} style={styles.waypointItem}>
-              <Text style={styles.waypointLabel}>
-                {index === 0 ? 'Start' : index === waypoints.length - 1 ? 'End' : `Waypoint ${index}`}
-              </Text>
+              {isEditingName && editingNameIndex === index ? (
+                <View style={styles.waypointNameEdit}>
+                  <TextInput
+                    style={styles.waypointNameInput}
+                    value={editingWaypointName}
+                    onChangeText={setEditingWaypointName}
+                    placeholder="Enter waypoint name"
+                    placeholderTextColor={theme.colors.text.secondary}
+                    autoFocus
+                    onSubmitEditing={handleNameSave}
+                  />
+                  <TouchableOpacity
+                    onPress={handleNameSave}
+                    style={styles.waypointNameSaveButton}
+                  >
+                    <Ionicons name="checkmark" size={20} color={theme.colors.primary[500]} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsEditingName(false);
+                      setEditingNameIndex(null);
+                      setEditingWaypointName('');
+                    }}
+                    style={styles.waypointNameSaveButton}
+                  >
+                    <Ionicons name="close" size={20} color={theme.colors.error[500]} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => handleWaypointNameEdit(index)}
+                  style={styles.waypointLabelContainer}
+                >
+                  <Text style={styles.waypointLabel}>
+                    {waypoint.name || (index === 0 ? 'Start' : index === waypoints.length - 1 ? 'End' : `Waypoint ${index}`)}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <Text style={styles.coordinatesText}>
                 {formatCoordinates(waypoint.coordinates)}
               </Text>
