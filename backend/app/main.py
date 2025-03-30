@@ -4,6 +4,7 @@ from app.core.config import get_settings
 from app.routes.route import router
 from app.db.database import engine
 from app.db import models
+from .routes import route, places
 
 settings = get_settings()
 
@@ -28,6 +29,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(router, prefix=settings.API_V1_STR)
+app.include_router(places.router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 async def root():
@@ -37,7 +39,8 @@ async def root():
         "version": settings.VERSION,
         "endpoints": {
             "routes": f"{settings.API_V1_STR}/routes/",
-            "calculate": f"{settings.API_V1_STR}/route/"
+            "calculate": f"{settings.API_V1_STR}/route/",
+            "places": f"{settings.API_V1_STR}/places/"
         }
     }
 

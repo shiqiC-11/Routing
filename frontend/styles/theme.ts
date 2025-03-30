@@ -24,7 +24,17 @@ export interface ThemeColors {
   success: ColorPalette;
   error: ColorPalette;
   warning: ColorPalette;
-  background: string;
+  background: {
+    primary: string;
+    secondary: string;
+    card: string;
+    inverse: string;
+  };
+  border: {
+    light: string;
+    medium: string;
+    dark: string;
+  };
   surface: string;
   text: {
     primary: string;
@@ -160,7 +170,12 @@ const colors: ThemeColors = {
     800: '#EF6C00',
     900: '#E65100'
   },
-  background: '#F8F9FA',
+  background: {
+    primary: '#F8F9FA',
+    secondary: '#F8F9FA',
+    card: '#FFFFFF',
+    inverse: '#000000'
+  },
   surface: '#FFFFFF',
   text: {
     primary: 'rgba(0, 0, 0, 0.87)',
@@ -180,7 +195,12 @@ const colors: ThemeColors = {
     dark: 'rgba(0, 0, 0, 0.5)',
     light: 'rgba(255, 255, 255, 0.5)'
   },
-  danger: '#F44336'
+  danger: '#F44336',
+  border: {
+    light: '#E0E0E0',
+    medium: '#9E9E9E',
+    dark: '#616161'
+  }
 };
 
 // Spacing system

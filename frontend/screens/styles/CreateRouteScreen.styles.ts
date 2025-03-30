@@ -7,7 +7,7 @@ const screenWidth = Dimensions.get('window').width;
 export const styles = StyleSheet.create({ 
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.background.primary,
   },
   headerGradient: {
     paddingTop: Platform.OS === 'ios' ? 44 : 40,
@@ -523,5 +523,12 @@ export const styles = StyleSheet.create({
   waypointLabelContainer: {
     flex: 1,
     marginRight: 8,
+  },
+  searchContainer: {
+    position: 'absolute',
+    top: theme.spacing.medium,
+    left: theme.spacing.medium,
+    right: theme.spacing.medium,
+    zIndex: 1,
   },
 }); 

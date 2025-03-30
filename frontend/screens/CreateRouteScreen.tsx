@@ -18,6 +18,7 @@ import * as Sharing from 'expo-sharing';
 import { StylePanel } from '../components/StylePanel';
 import { IconPanel } from '../components/IconPanel';
 import { RouteStyle, MapIcon } from '../types/map';
+import { WaypointSearch } from '../components/WaypointSearch';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -211,11 +212,12 @@ const CreateRouteScreen = () => {
     setRoute({}); // Clear the route when waypoints change
   };
 
-  const handleAddWaypoint = (coordinate: Coordinates) => {
+  const handleAddWaypoint = (coordinate: Coordinates, name?: string) => {
     if (waypoints.length < MAX_WAYPOINTS) {
       const newWaypoint: RouteWaypoint = {
         id: Math.random().toString(36).substr(2, 9), // Generate a random ID
         coordinates: coordinate,
+        name: name, // Add the name from search
         order: waypoints.length,
         type: waypoints.length === 0 ? 'origin' : 
               waypoints.length === 1 ? 'destination' : 'waypoint',
@@ -518,6 +520,21 @@ const CreateRouteScreen = () => {
               height={300}
             />
           )}
+
+          <View style={styles.searchContainer}>
+            <WaypointSearch
+              onSelectLocation={(location) => {
+                handleAddWaypoint(location.coordinates, location.name);
+              }}
+              placeholder={
+                waypoints.length === 0
+                  ? "Search for origin"
+                  : waypoints.length === 1
+                  ? "Search for destination"
+                  : "Search for waypoint"
+              }
+            />
+          </View>
 
           <MapIcons
             icons={mapIcons}

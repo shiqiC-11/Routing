@@ -45,10 +45,12 @@ yarn-error.*
 *.tsbuildinfo
 
 # Xcode
-ios/
+ios/build/
+ios/Pods/
+
 *.xcworkspace
 xcuserdata/
-*.xcodeproj/project.xcworkspace/xcuserdata
+*.xcodeproj/
 
 # Fastlane
 fastlane/report.xml

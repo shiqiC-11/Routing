@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "postinstall": "npx pod-install"
+    "postinstall": "npx pod-install && echo '\n⚠️ IMPORTANT: If you need native modules, run: cd ios && ./setup-native-modules.sh\n'"
   },
   "dependencies": {
     "@react-native-community/blur": "^4.4.1",
@@ -16,9 +16,12 @@
     "@react-navigation/native": "^6.1.12",
     "@react-navigation/native-stack": "^6.9.22",
     "@react-navigation/stack": "^6.3.22",
+    "@shopify/react-native-skia": "0.1.221",
+    "@types/react": "~18.2.45",
     "axios": "^1.6.2",
     "expo": "~50.0.0",
     "expo-file-system": "~16.0.9",
+    "expo-location": "~16.5.5",
     "expo-media-library": "~15.9.2",
     "expo-sharing": "~11.10.0",
     "expo-splash-screen": "~0.26.5",
@@ -27,18 +30,16 @@
     "react-native": "0.73.6",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-maps": "1.10.0",
-    "@shopify/react-native-skia": "0.1.221",
     "react-native-reanimated": "~3.6.2",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
     "react-native-svg": "14.1.0",
-    "typescript": "^5.3.0",
-    "@types/react": "~18.2.45",
-    "expo-location": "~16.5.5"
+    "typescript": "^5.3.0"
   },
   "devDependencies": {
-    "babel-preset-expo": "^10.0.0",
-    "@tsconfig/react-native": "^2.0.3"
+    "@tsconfig/react-native": "^2.0.3",
+    "@types/lodash": "^4.17.16",
+    "babel-preset-expo": "^10.0.0"
   },
   "private": true
 }
